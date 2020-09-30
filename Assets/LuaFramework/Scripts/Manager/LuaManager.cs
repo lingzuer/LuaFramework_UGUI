@@ -2,14 +2,17 @@
 using System.Collections;
 using LuaInterface;
 
-namespace LuaFramework {
-    public class LuaManager : Manager {
+namespace LuaFramework
+{
+    public class LuaManager : Manager
+    {
         private LuaState lua;
         private LuaLoader loader;
         private LuaLooper loop = null;
 
         // Use this for initialization
-        void Awake() {
+        void Awake()
+        {
             loader = new LuaLoader();
             lua = new LuaState();
             this.OpenLibs();
@@ -20,7 +23,8 @@ namespace LuaFramework {
             LuaCoroutine.Register(lua, this);
         }
 
-        public void InitStart() {
+        public void InitStart()
+        {
             InitLuaPath();
             InitLuaBundle();
             this.lua.Start();    //启动LUAVM
@@ -28,13 +32,15 @@ namespace LuaFramework {
             this.StartLooper();
         }
 
-        void StartLooper() {
+        void StartLooper()
+        {
             loop = gameObject.AddComponent<LuaLooper>();
             loop.luaState = lua;
         }
 
         //cjson 比较特殊，只new了一个table，没有注册库，这里注册一下
-        protected void OpenCJson() {
+        protected void OpenCJson()
+        {
             lua.LuaGetField(LuaIndexes.LUA_REGISTRYINDEX, "_LOADED");
             lua.OpenLibs(LuaDLL.luaopen_cjson);
             lua.LuaSetField(-2, "cjson");
@@ -43,22 +49,22 @@ namespace LuaFramework {
             lua.LuaSetField(-2, "cjson.safe");
         }
 
-        void StartMain() {
+        void StartMain()
+        {
             lua.DoFile("Main.lua");
 
             LuaFunction main = lua.GetFunction("Main");
             main.Call();
             main.Dispose();
-            main = null;    
+            main = null;
         }
-        
+
         /// <summary>
         /// 初始化加载第三方库
         /// </summary>
-        void OpenLibs() {
-            lua.OpenLibs(LuaDLL.luaopen_pb);      
-            lua.OpenLibs(LuaDLL.luaopen_sproto_core);
-            lua.OpenLibs(LuaDLL.luaopen_protobuf_c);
+        void OpenLibs()
+        {
+            lua.OpenLibs(LuaDLL.luaopen_pb);
             lua.OpenLibs(LuaDLL.luaopen_lpeg);
             lua.OpenLibs(LuaDLL.luaopen_bit);
             lua.OpenLibs(LuaDLL.luaopen_socket_core);
@@ -69,12 +75,16 @@ namespace LuaFramework {
         /// <summary>
         /// 初始化Lua代码加载路径
         /// </summary>
-        void InitLuaPath() {
-            if (AppConst.DebugMode) {
+        void InitLuaPath()
+        {
+            if (AppConst.DebugMode)
+            {
                 string rootPath = AppConst.FrameworkRoot;
                 lua.AddSearchPath(rootPath + "/Lua");
                 lua.AddSearchPath(rootPath + "/ToLua/Lua");
-            } else {
+            }
+            else
+            {
                 lua.AddSearchPath(Util.DataPath + "lua");
             }
         }
@@ -82,8 +92,10 @@ namespace LuaFramework {
         /// <summary>
         /// 初始化LuaBundle
         /// </summary>
-        void InitLuaBundle() {
-            if (loader.beZip) {
+        void InitLuaBundle()
+        {
+            if (loader.beZip)
+            {
                 loader.AddBundle("lua/lua.unity3d");
                 loader.AddBundle("lua/lua_math.unity3d");
                 loader.AddBundle("lua/lua_system.unity3d");
@@ -104,24 +116,29 @@ namespace LuaFramework {
             }
         }
 
-        public void DoFile(string filename) {
+        public void DoFile(string filename)
+        {
             lua.DoFile(filename);
         }
 
         // Update is called once per frame
-        public object[] CallFunction(string funcName, params object[] args) {
+        public object[] CallFunction(string funcName, params object[] args)
+        {
             LuaFunction func = lua.GetFunction(funcName);
-            if (func != null) {
+            if (func != null)
+            {
                 return func.LazyCall(args);
             }
             return null;
         }
 
-        public void LuaGC() {
+        public void LuaGC()
+        {
             lua.LuaGC(LuaGCOptions.LUA_GCCOLLECT);
         }
 
-        public void Close() {
+        public void Close()
+        {
             loop.Destroy();
             loop = null;
 

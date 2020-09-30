@@ -541,7 +541,7 @@ PlayerSettings:
   webGLWasmStreaming: 0
   scriptingDefineSymbols:
     1: ASYNC_MODE
-    4: ASYNC_MODE
+    4: ASYNC_MODE;LUAC_5_3
     7: ASYNC_MODE
   platformArchitecture:
     iOS: 0
